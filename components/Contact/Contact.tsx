@@ -2,6 +2,8 @@
 
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export const Contact = () => {
     const ref = useRef(null);
@@ -12,6 +14,40 @@ export const Contact = () => {
 
     const y = useTransform(scrollYProgress, [0, 1], ["50%", "0%"]);
     const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+
+    // Form State
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        message: ""
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus("submitting");
+
+        try {
+            // Save to Firebase Firestore "leads" collection
+            await addDoc(collection(db, "leads"), {
+                ...formData,
+                timestamp: serverTimestamp(),
+                source: "Portfolio Contact Form"
+            });
+
+            // SUCCESS!
+            setStatus("success");
+            setFormData({ name: "", email: "", message: "" });
+            
+            // Also notify via mailto in case they want it instantly
+            // This is optional - but good for direct contact
+            // window.open(`mailto:professionalthumbnaileditor@gmail.com?subject=New Project Inquiry&body=${formData.message}`, '_blank');
+            
+        } catch (error) {
+            console.error("Firestore Error:", error);
+            setStatus("error");
+        }
+    };
 
     return (
         <section ref={ref} id="contact" className="relative bg-orange-600 py-20 md:py-48 px-4 md:px-16 text-black overflow-hidden flex flex-col items-center justify-center rounded-t-[2rem] md:rounded-t-[6rem]">
@@ -26,53 +62,56 @@ export const Contact = () => {
                     Start a<br />Project
                 </h2>
 
-                {/* 
-                    Using the high-reliability Formspree Redirect method. 
-                    This version doesn't use complex JavaScript fetching, 
-                    so it works 100% of the time on all browsers and devices. 
-                */}
-                <form 
-                    action="https://formspree.io/f/professionalthumbnaileditor@gmail.com" 
-                    method="POST" 
-                    className="max-w-2xl mx-auto flex flex-col gap-6 text-left"
-                >
+                <form onSubmit={handleSubmit} className="max-w-2xl mx-auto flex flex-col gap-6 text-left">
                     <div className="flex flex-col md:flex-row gap-6">
                         <input
                             required
-                            name="name"
                             type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({...formData, name: e.target.value})}
                             placeholder="YOUR NAME"
                             className="w-full bg-transparent border-b-2 border-black/30 placeholder-black/50 py-4 px-2 text-xl font-medium focus:outline-none focus:border-black transition-colors"
                         />
                         <input
                             required
-                            name="email"
                             type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
                             placeholder="YOUR EMAIL"
                             className="w-full bg-transparent border-b-2 border-black/30 placeholder-black/50 py-4 px-2 text-xl font-medium focus:outline-none focus:border-black transition-colors"
                         />
                     </div>
                     <textarea
                         required
-                        name="message"
                         rows={4}
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
                         placeholder="TELL ME ABOUT YOUR PROJECT"
                         className="bg-transparent border-b-2 border-black/30 placeholder-black/50 py-4 px-2 text-xl font-medium focus:outline-none focus:border-black transition-colors resize-none mt-4"
                     />
+                    
                     <button
+                        disabled={status === "submitting"}
                         type="submit"
-                        className="group relative mt-12 self-start md:self-center overflow-hidden rounded-full bg-black px-12 py-6 text-xl font-bold uppercase tracking-widest text-white transition-all hover:scale-105"
+                        className="group relative mt-12 self-start md:self-center overflow-hidden rounded-full bg-black px-12 py-6 text-xl font-bold uppercase tracking-widest text-white transition-all hover:scale-105 disabled:opacity-50"
                     >
-                        <span className="relative z-10">Send Message</span>
+                        <span className="relative z-10">
+                            {status === "idle" && "Send Message"}
+                            {status === "submitting" && "Submitting..."}
+                            {status === "success" && "Sent to Database!"}
+                            {status === "error" && "Error! Try Again"}
+                        </span>
                         <div className="absolute inset-0 z-0 h-full w-0 bg-white group-hover:w-full transition-all duration-500 ease-out" />
                         <span className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 transition-opacity duration-500 group-hover:opacity-100 uppercase tracking-widest whitespace-nowrap">
-                            Click to Send →
+                            Push to Database →
                         </span>
                     </button>
 
-                    <p className="text-black/50 text-[10px] text-center font-bold uppercase tracking-widest mt-8">
-                        * Powered by Formspree API. Please check your Gmail SPAM folder if you don't see the confirmation.
-                    </p>
+                    {status === "success" && (
+                        <p className="text-black text-center font-bold text-xs uppercase tracking-widest mt-8 animate-pulse">
+                            Success! Your message is securely saved in your Firebase Database. 🚀
+                        </p>
+                    )}
                 </form>
             </motion.div>
         </section>
