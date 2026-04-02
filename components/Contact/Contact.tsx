@@ -17,6 +17,7 @@ export const Contact = () => {
 
     // Form State
     const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -26,26 +27,37 @@ export const Contact = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus("submitting");
+        setErrorMessage("");
+
+        // Timeout logic to prevent the button from hanging forever
+        const timeout = setTimeout(() => {
+            if (status === "submitting") {
+                setStatus("error");
+                setErrorMessage("Connection Timeout. Please check your network or Firebase rules.");
+            }
+        }, 10000); // 10 seconds timeout
 
         try {
+            console.log("Attempting to save lead to Firebase...", formData);
+            
             // Save to Firebase Firestore "leads" collection
-            await addDoc(collection(db, "leads"), {
+            const docRef = await addDoc(collection(db, "leads"), {
                 ...formData,
                 timestamp: serverTimestamp(),
-                source: "Portfolio Contact Form"
+                source: "Portfolio Contact Form",
+                createdAt: new Date().toISOString()
             });
 
-            // SUCCESS!
+            console.log("Document successfully written with ID: ", docRef.id);
+            clearTimeout(timeout);
             setStatus("success");
             setFormData({ name: "", email: "", message: "" });
             
-            // Also notify via mailto in case they want it instantly
-            // This is optional - but good for direct contact
-            // window.open(`mailto:professionalthumbnaileditor@gmail.com?subject=New Project Inquiry&body=${formData.message}`, '_blank');
-            
-        } catch (error) {
-            console.error("Firestore Error:", error);
+        } catch (error: any) {
+            clearTimeout(timeout);
+            console.error("FIREBASE ERROR:", error);
             setStatus("error");
+            setErrorMessage(error.message || "Failed to connect to Database. Did you enable 'Rules' in Firebase?");
         }
     };
 
@@ -97,20 +109,28 @@ export const Contact = () => {
                     >
                         <span className="relative z-10">
                             {status === "idle" && "Send Message"}
-                            {status === "submitting" && "Submitting..."}
-                            {status === "success" && "Sent to Database!"}
-                            {status === "error" && "Error! Try Again"}
+                            {status === "submitting" && "Linking Database..."}
+                            {status === "success" && "Sent Successfully!"}
+                            {status === "error" && "Connection Error"}
                         </span>
                         <div className="absolute inset-0 z-0 h-full w-0 bg-white group-hover:w-full transition-all duration-500 ease-out" />
                         <span className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 transition-opacity duration-500 group-hover:opacity-100 uppercase tracking-widest whitespace-nowrap">
-                            Push to Database →
+                            Try Again →
                         </span>
                     </button>
 
                     {status === "success" && (
-                        <p className="text-black text-center font-bold text-xs uppercase tracking-widest mt-8 animate-pulse">
+                        <p className="text-black text-center font-bold text-xs uppercase tracking-widest mt-8">
                             Success! Your message is securely saved in your Firebase Database. 🚀
                         </p>
+                    )}
+
+                    {status === "error" && (
+                        <div className="mt-8 p-4 bg-black/10 border border-black/20 rounded-2xl text-center">
+                            <p className="text-black font-bold text-xs uppercase tracking-widest mb-2">Error Details:</p>
+                            <p className="text-black/70 text-xs font-mono">{errorMessage}</p>
+                            <p className="text-black text-[10px] font-bold uppercase mt-4 opacity-50">Please ensure Firebase Rules are set to 'test mode' or 'write: if true'</p>
+                        </div>
                     )}
                 </form>
             </motion.div>
