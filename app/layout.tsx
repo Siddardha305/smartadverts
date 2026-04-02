@@ -76,8 +76,8 @@ export const metadata: Metadata = {
     creator: "@smartadverts_",
   },
   icons: {
-    icon: "/sa.png",
-    apple: "/sa.png",
+    icon: "/logo/smartadvertslogo.png",
+    apple: "/logo/smartadvertslogo.png",
   },
   robots: {
     index: true,
