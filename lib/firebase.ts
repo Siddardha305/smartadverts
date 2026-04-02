@@ -1,6 +1,9 @@
 // lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6-GluoLULQH3BiAbuoe4F4za5j0gK6vg",
@@ -15,9 +18,14 @@ const firebaseConfig = {
 // Initialize Firebase (Singleton pattern to prevent re-initialization in Next.js HMR)
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
+// Initialize Firebase Services
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
+
 // Initialize Analytics carefully for SSR (Server Side Rendering)
-export const analytics = (async () => {
-    if (globalThis.window !== undefined) {
+const analytics = (async () => {
+    if (typeof globalThis.window !== "undefined") {
         const supported = await isSupported();
         if (supported) {
             return getAnalytics(app);
@@ -26,4 +34,4 @@ export const analytics = (async () => {
     return null;
 })();
 
-export { app };
+export { app, db, auth, storage, analytics };
