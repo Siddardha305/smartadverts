@@ -9,6 +9,8 @@ const outfit = Outfit({
 });
 
 import Script from "next/script";
+import "@/lib/firebase"; // Initialize Firebase immediately
+
 
 const siteConfig = {
   name: "SmartAdverts | Creative Design Studio",
@@ -26,7 +28,7 @@ const siteConfig = {
     "SmartAdverts",
     "creative studio India"
   ],
-  googleAnalyticsId: "G-XXXXXXXXXX" // REPLACE THIS with your actual Google Analytics ID
+  googleAnalyticsId: "G-NE0HZLY33B" // Firebase Measurement ID
 };
 
 export const metadata: Metadata = {
