@@ -1,17 +1,29 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { BeforeAfterSlider } from "@/components/Works/BeforeAfterSlider";
-import { beforeAfterWorks } from "@/components/Works/worksData";
+import { BeforeAfterCard } from "@/components/Works/BeforeAfterCard";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import Link from "next/link";
+
+interface PortfolioItem {
+    id: string;
+    title: string;
+    description: string;
+    before: string;
+    after: string;
+}
 
 /**
  * FeaturedThumbnails Component (Home Page Version)
  * Shows a selection of Before/After comparisons from the dynamic portfolio.
  */
 export const FeaturedThumbnails = () => {
+    const [displayWorks, setDisplayWorks] = useState<PortfolioItem[]>([]);
     const ref = useRef(null);
+    
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start end", "end start"],
@@ -20,12 +32,27 @@ export const FeaturedThumbnails = () => {
     const y1 = useTransform(scrollYProgress, [0, 1], [0, 200]);
     const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-    // Use the first few items from the main dynamic beforeAfterWorks array
-    const displayWorks = beforeAfterWorks.slice(0, 4);
+    useEffect(() => {
+        const q = query(
+            collection(db, "portfolio"), 
+            orderBy("timestamp", "desc"), 
+            limit(4)
+        );
+        
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetched = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as PortfolioItem));
+            setDisplayWorks(fetched);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <section ref={ref} className="relative py-32 px-4 md:px-16 overflow-hidden bg-black text-white border-none">
-            <div className="relative z-10 max-w-1100px mx-auto">
+            <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-16 gap-6">
                     <div>
                         <motion.h2
@@ -61,18 +88,17 @@ export const FeaturedThumbnails = () => {
                     </motion.div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     {displayWorks.map((item, idx) => (
-                        <motion.div
+                        <BeforeAfterCard 
                             key={item.id}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 0.6, delay: idx * 0.1 }}
-                            className="w-full aspect-video rounded-3xl overflow-hidden border border-white/5"
-                        >
-                            <BeforeAfterSlider beforeImage={item.before} afterImage={item.after} />
-                        </motion.div>
+                            index={idx}
+                            title={item.title}
+                            description={item.description}
+                            before={item.before}
+                            after={item.after}
+                            span="col-span-1"
+                        />
                     ))}
                 </div>
             </div>

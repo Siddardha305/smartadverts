@@ -28,6 +28,12 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeImag
         handleMove(e.touches[0].clientX);
     };
 
+    if (!beforeImage && !afterImage) return <div className="w-full h-full bg-zinc-900 rounded-xl" />;
+
+    // If only one image is provided, display it exactly as is for both sides of the slider without filters
+    const actualBefore = beforeImage || afterImage;
+    const actualAfter = afterImage || beforeImage;
+
     return (
         <div
             ref={containerRef}
@@ -43,7 +49,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeImag
             {/* Before Image (Background) */}
             <div className="absolute inset-0">
                 <Image
-                    src={beforeImage}
+                    src={actualBefore}
                     alt="Before"
                     fill
                     className="object-cover select-none pointer-events-none"
@@ -59,7 +65,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeImag
                 style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
                 <Image
-                    src={afterImage}
+                    src={actualAfter}
                     alt="After"
                     fill
                     className="object-cover select-none pointer-events-none"

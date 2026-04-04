@@ -38,10 +38,10 @@ export const BeforeAfterCard: React.FC<BeforeAfterCardProps> = ({
             delay={index * 0.1}
             className={`${span} flex flex-col group h-full`}
         >
-            <div className="relative flex-1 flex flex-col gap-4 bg-zinc-900/10 hover:bg-zinc-900/20 p-4 md:p-5 rounded-[2.5rem] border border-white/5 transition-all duration-700 hover:border-orange-500/20 hover:shadow-[0_20px_80px_rgba(234,88,12,0.08)]">
+            <div className="relative flex-1 flex flex-col gap-6 bg-transparent md:bg-zinc-950 p-0 md:p-8 rounded-[3rem] border border-transparent md:border-white/5 transition-all duration-700 hover:border-orange-500/20 hover:shadow-[0_40px_120px_rgba(234,88,12,0.1)]">
                 
-                {/* The Comparison Slider Container (Thumbnail 16:9 Size) */}
-                <div className="relative aspect-video rounded-[1.8rem] overflow-hidden shadow-2xl bg-black border border-white/5 group-hover:border-orange-500/10 transition-colors duration-500 flex-shrink-0">
+                {/* Image Container (Flush but slightly rounded inside) */}
+                <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl bg-black border border-white/5 group-hover:border-orange-500/10 transition-colors duration-500 flex-shrink-0">
                     <BeforeAfterSlider beforeImage={before} afterImage={after} />
                 </div>
 
@@ -50,13 +50,13 @@ export const BeforeAfterCard: React.FC<BeforeAfterCardProps> = ({
                     <div className="flex justify-between items-end gap-4">
                         <div className="flex-1">
                             <motion.h3 
-                                className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white leading-none mb-3"
+                                className="text-3xl lg:text-4xl font-black uppercase tracking-tighter text-white leading-none mb-4 italic"
                                 initial={{ opacity: 0.8 }}
                                 whileInView={{ opacity: 1 }}
                             >
                                 {title}
                             </motion.h3>
-                            <p className="text-zinc-500 text-sm md:text-base font-medium leading-relaxed line-clamp-2">
+                            <p className="text-zinc-500 text-sm md:text-lg font-medium leading-relaxed line-clamp-2 italic">
                                 {description}
                             </p>
                         </div>

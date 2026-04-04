@@ -2,163 +2,291 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "@/lib/firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { collection, query, orderBy, onSnapshot, Timestamp } from "firebase/firestore";
-import { motion, AnimatePresence } from "framer-motion";
+import { auth, db, storage } from "@/lib/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { 
+    collection, 
+    query, 
+    orderBy, 
+    onSnapshot, 
+    addDoc, 
+    deleteDoc, 
+    doc, 
+    setDoc, 
+    getDoc,
+    Timestamp 
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Mailbox, PaintBucket, Settings } from "lucide-react";
+import { Toast, ToastType } from "@/components/ui/Toast";
+import { ConfirmModal, ConfirmDialogData } from "@/components/ui/ConfirmModal";
 
-interface Lead {
-    id: string;
-    name: string;
-    email: string;
-    message: string;
-    timestamp: any;
-}
+// Import Custom Views
+import { AdminSidebar } from "./components/Sidebar/AdminSidebar";
+import { LeadsView } from "./components/Leads/LeadsView";
+import { PortfolioView } from "./components/Portfolio/PortfolioView";
+import { SettingsView } from "./components/Settings/SettingsView";
+import { PortfolioModal } from "./components/Portfolio/PortfolioModal";
+import { Lead, PortfolioItem, SiteSettings } from "./types";
 
 export default function AdminDashboard() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<"leads" | "portfolio" | "settings">("leads");
+
+    // Leads State
     const [leads, setLeads] = useState<Lead[]>([]);
     
+    // Portfolio State
+    const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+    const [isAddingProject, setIsAddingProject] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [newProject, setNewProject] = useState({ title: "", description: "" });
+    const [beforeFile, setBeforeFile] = useState<File | null>(null);
+    const [afterFile, setAfterFile] = useState<File | null>(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+
+    // Overlay States (Theme Popups)
+    const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+    const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogData | null>(null);
+
+    const showToast = (message: string, type: ToastType = "success") => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    // Settings State
+    const [settings, setSettings] = useState<SiteSettings>({
+        agencyName: "SmartAdverts",
+        heroHeadline: "Professional Designs for Your Business",
+        heroSubheadline: "We create everything from social media posts and banners to highly-converting thumbnails.",
+        instagramUrl: "https://www.instagram.com/smartadverts_/",
+        email: "professionalthumbnaileditor@gmail.com",
+        pricingStartingFrom: "₹8k/mo"
+    });
+    const [isSavingSettings, setIsSavingSettings] = useState(false);
+
     // Auth Check
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (!currentUser) {
-                // If not logged in, redirect to login page
-                router.push("/admin/login");
-            } else {
-                setUser(currentUser);
-                setLoading(false);
-            }
+            if (!currentUser) router.push("/admin/login");
+            else { setUser(currentUser); setLoading(false); }
         });
-
         return () => unsubscribe();
     }, [router]);
 
-    // Fetch Leads once logged in
+    // Data Fetching
     useEffect(() => {
         if (!user) return;
-
-        const q = query(collection(db, "leads"), orderBy("timestamp", "desc"));
-        const unsubLeads = onSnapshot(q, (snapshot) => {
-            const fetchedLeads = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as Lead));
-            setLeads(fetchedLeads);
+        const qLeads = query(collection(db, "leads"), orderBy("timestamp", "desc"));
+        const unsubLeads = onSnapshot(qLeads, (snapshot) => {
+            setLeads(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead)));
         });
-
-        return () => unsubLeads();
+        const qPortfolio = query(collection(db, "portfolio"), orderBy("timestamp", "desc"));
+        const unsubPortfolio = onSnapshot(qPortfolio, (snapshot) => {
+            setPortfolio(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioItem)));
+        });
+        const fetchSettings = async () => {
+            const settingsDoc = await getDoc(doc(db, "config", "siteSettings"));
+            if (settingsDoc.exists()) setSettings(settingsDoc.data() as SiteSettings);
+        };
+        fetchSettings();
+        return () => { unsubLeads(); unsubPortfolio(); };
     }, [user]);
 
-    const handleLogout = async () => {
-        await signOut(auth);
-        router.push("/admin/login");
+    // Image Compression Logic
+    const compressImage = async (file: File): Promise<Blob | File> => {
+        return new Promise((resolve) => {
+            const url = URL.createObjectURL(file);
+            const img = new window.Image();
+            img.src = url;
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1200;
+                let width = img.width; let height = img.height;
+                const aspect = width / height;
+                if (width > MAX_WIDTH) { width = MAX_WIDTH; height = width / aspect; }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return resolve(file);
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else resolve(file);
+                }, 'image/jpeg', 0.8);
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                resolve(file);
+            };
+        });
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
+    const handleAddPortfolio = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingId && !beforeFile && !afterFile) return showToast("Please select at least one image!", "error");
+        setIsUploading(true); 
+        setUploadProgress(5);
+        
+        try {
+            // 1. SEQUENTIAL COMPRESSION (STABLE)
+            setUploadProgress(10);
+            const beforeBlob = beforeFile ? await compressImage(beforeFile) : null;
+            setUploadProgress(20);
+            const afterBlob = afterFile ? await compressImage(afterFile) : null;
+            setUploadProgress(30);
+
+            let bu = ""; 
+            let au = "";
+            const dateFolder = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+            // 2. BULLETPROOF SEQUENTIAL UPLOADS
+            if (beforeBlob) {
+                const br = ref(storage, `portfolio/${dateFolder}/${Date.now()}_before.jpg`); 
+                const bt = await uploadBytes(br, beforeBlob);
+                bu = await getDownloadURL(bt.ref);
+                setUploadProgress(60);
+            }
+
+            if (afterBlob) {
+                const ar = ref(storage, `portfolio/${dateFolder}/${Date.now()}_after.jpg`); 
+                const at = await uploadBytes(ar, afterBlob);
+                au = await getDownloadURL(at.ref);
+                setUploadProgress(90);
+            }
+
+            if (editingId) {
+                const updateData: any = { title: newProject.title, description: newProject.description };
+                if (bu) updateData.before = bu; 
+                if (au) updateData.after = au;
+                await setDoc(doc(db, "portfolio", editingId), updateData, { merge: true });
+                setEditingId(null);
+            } else {
+                await addDoc(collection(db, "portfolio"), { 
+                    title: newProject.title, 
+                    description: newProject.description, 
+                    before: bu, 
+                    after: au, 
+                    timestamp: Timestamp.now() 
+                });
+            }
+
+            setUploadProgress(100);
+            setTimeout(() => {
+                setIsAddingProject(false); 
+                setNewProject({ title: "", description: "" }); 
+                setBeforeFile(null); 
+                setAfterFile(null); 
+                setUploadProgress(0);
+                setIsUploading(false);
+            }, 500);
+            
+        } catch (err: any) { 
+            console.error(err);
+            showToast(`Error: ${err.message || "Upload failed. Please try again."}`, "error"); 
+            setIsUploading(false);
+            setUploadProgress(0);
+        }
+    };
+
+    const handleEditProject = (item: PortfolioItem) => {
+        setNewProject({ title: item.title, description: item.description });
+        setEditingId(item.id);
+        setIsAddingProject(true);
+    };
+
+    const handleDeleteProject = (id: string) => { 
+        setConfirmDialog({
+            isOpen: true,
+            title: "Delete Case Study",
+            message: "Are you sure you want to delete this project? This action cannot be undone.",
+            onConfirm: async () => {
+                await deleteDoc(doc(db, "portfolio", id));
+                showToast("Project Deleted", "success");
+                setConfirmDialog(null);
+            }
+        });
+    };
+    
+    const handleSaveSettings = async (e: React.FormEvent) => { 
+        e.preventDefault(); 
+        setIsSavingSettings(true); 
+        try { 
+            await setDoc(doc(db, "config", "siteSettings"), settings); 
+            showToast("Website Config Updated!"); 
+        } catch (err) { 
+            showToast("Error updating settings!", "error"); 
+        } finally { 
+            setIsSavingSettings(false); 
+        } 
+    };
+    
+    const handleLogout = async () => { await signOut(auth); router.push("/admin/login"); };
+
+    if (loading) return <div className="min-h-screen bg-black flex items-center justify-center font-black italic text-orange-500 uppercase tracking-widest animate-pulse">Igniting Admin...</div>;
+
+    const navItems = [
+        { id: "leads", label: "Inquiries", icon: <Mailbox className="w-5 h-5" />, count: leads.length },
+        { id: "portfolio", label: "Work CMS", icon: <PaintBucket className="w-5 h-5" />, count: portfolio.length },
+        { id: "settings", label: "Branding", icon: <Settings className="w-5 h-5" /> },
+    ];
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white selection:bg-orange-500 selection:text-white">
-            {/* Header */}
-            <header className="fixed top-0 inset-x-0 bg-black/80 backdrop-blur-xl border-b border-white/5 z-50 py-4 px-4 md:px-8 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center font-black text-xl italic">SA</div>
-                    <h1 className="font-bold text-xl uppercase tracking-tighter">Admin Dashboard</h1>
-                </div>
-                <div className="flex items-center gap-6">
-                    <div className="hidden md:block text-right">
-                        <p className="text-xs text-zinc-500 uppercase font-black">Logged in as</p>
-                        <p className="text-sm font-bold text-zinc-300">{user?.email}</p>
-                    </div>
-                    <button 
-                        onClick={handleLogout}
-                        className="px-6 py-2.5 bg-zinc-900 hover:bg-rose-950/30 border border-white/10 hover:border-rose-500/50 rounded-full text-xs font-black uppercase tracking-widest transition-all"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </header>
+        <div className="flex flex-col md:flex-row min-h-screen bg-zinc-950 text-white selection:bg-orange-500/30">
+            {/* Componentized Sidebar */}
+            <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} navItems={navItems} onLogout={handleLogout} />
 
-            {/* Main Content */}
-            <main className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
+            {/* Main Content Area */}
+            <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen custom-scrollbar">
+                {activeTab === "leads" && <LeadsView leads={leads} />}
                 
-                <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
-                    <div>
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Client <br /><span className="text-orange-500">Inquiries</span></h2>
-                        <p className="text-zinc-500 mt-2 font-medium">Total messages: {leads.length}</p>
-                    </div>
-                    <div className="flex gap-4">
-                         <div className="p-4 bg-zinc-900/50 border border-white/5 rounded-3xl min-w-[140px] text-center">
-                            <p className="text-[10px] text-orange-500 font-bold uppercase tracking-widest mb-1">Active Leads</p>
-                            <p className="text-3xl font-black">{leads.length}</p>
-                         </div>
-                    </div>
-                </div>
+                {activeTab === "portfolio" && (
+                    <PortfolioView 
+                        portfolio={portfolio} 
+                        onAdd={() => setIsAddingProject(true)} 
+                        onEdit={handleEditProject} 
+                        onDelete={handleDeleteProject} 
+                    />
+                )}
 
-                {/* Leads List */}
-                <div className="grid grid-cols-1 gap-6 relative">
-                    <AnimatePresence mode="popLayout">
-                        {leads.length === 0 ? (
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="py-20 text-center bg-zinc-900/20 rounded-[3rem] border border-dashed border-white/10"
-                            >
-                                <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm">No messages yet. They will appear here when someone fills the form!</p>
-                            </motion.div>
-                        ) : (
-                            leads.map((lead, idx) => (
-                                <motion.div
-                                    key={lead.id}
-                                    layout
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    className="group relative bg-zinc-900/40 hover:bg-zinc-900/60 p-6 md:p-8 rounded-[2.5rem] border border-white/5 hover:border-orange-500/20 transition-all duration-500"
-                                >
-                                    <div className="flex flex-col md:flex-row justify-between gap-6">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <span className="px-3 py-1 bg-orange-600/10 text-orange-500 text-[10px] font-black uppercase tracking-widest rounded-full border border-orange-500/20">NEW LEAD</span>
-                                                <span className="text-[10px] text-zinc-500 uppercase font-black">
-                                                    {lead.timestamp instanceof Timestamp ? lead.timestamp.toDate().toLocaleString() : "Just now"}
-                                                </span>
-                                            </div>
-                                            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2 group-hover:text-orange-500 transition-colors">{lead.name}</h3>
-                                            <p className="text-orange-500/80 font-bold text-sm mb-6 pb-6 border-b border-white/5">{lead.email}</p>
-                                            
-                                            <div className="relative">
-                                                <p className="text-zinc-300 text-lg leading-relaxed relative z-10 italic">
-                                                    &quot;{lead.message}&quot;
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col justify-between items-end">
-                                            <a 
-                                                href={`mailto:${lead.email}?subject=Response from SmartAdverts`} 
-                                                className="px-8 py-4 bg-white text-black hover:bg-orange-500 hover:text-white rounded-full font-black uppercase tracking-widest text-xs transition-all flex items-center gap-2 group-hover:scale-105"
-                                            >
-                                                Reply Now
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))
-                        )}
-                    </AnimatePresence>
-                </div>
+                {activeTab === "settings" && (
+                    <SettingsView 
+                        settings={settings} 
+                        setSettings={setSettings} 
+                        onSave={handleSaveSettings} 
+                        isSaving={isSavingSettings} 
+                    />
+                )}
             </main>
+
+            {/* Componentized Portfolio Upload Modal */}
+            <PortfolioModal 
+                isOpen={isAddingProject}
+                editingId={editingId}
+                newProject={newProject}
+                setNewProject={setNewProject}
+                beforeFile={beforeFile}
+                setBeforeFile={setBeforeFile}
+                afterFile={afterFile}
+                setAfterFile={setAfterFile}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+                onSubmit={handleAddPortfolio}
+                onClose={() => {
+                    setIsAddingProject(false);
+                    setEditingId(null);
+                    setNewProject({ title: "", description: "" });
+                    setBeforeFile(null);
+                    setAfterFile(null);
+                }}
+            />
+
+            {/* Custom Theme Popups */}
+            <Toast toast={toast} />
+            <ConfirmModal dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
         </div>
     );
 }

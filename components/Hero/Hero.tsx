@@ -1,10 +1,30 @@
-import React, { useRef } from "react";
+"use client";
+
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Link from "next/link";
 import { HeroBadge } from "./HeroBadge";
 import { GridBackground } from "@/components/GridBackground";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 export const Hero = () => {
     const ref = useRef(null);
+    const [settings, setSettings] = useState({
+        heroHeadline: "Professional Designs for Your Business",
+        heroSubheadline: "We create everything from social media posts and banners to highly-converting thumbnails — so you can focus on building your business.",
+        pricingStartingFrom: "₹8k/mo"
+    });
+
+    useEffect(() => {
+        const unsub = onSnapshot(doc(db, "config", "siteSettings"), (doc) => {
+            if (doc.exists()) {
+                setSettings(doc.data() as any);
+            }
+        });
+        return () => unsub();
+    }, []);
+
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start start", "end start"],
@@ -49,9 +69,13 @@ export const Hero = () => {
                         transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                         className="text-center text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.05] max-w-5xl"
                     >
-                        <span className="text-white drop-shadow-sm">Professional Designs <br className="hidden md:block"/> for Your Business</span>
-                        <span className="block text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-rose-400 to-orange-500 drop-shadow-xl">
-                            Delivered in 24 Hours
+                         <span className="text-white drop-shadow-sm uppercase italic">
+                            {settings.heroHeadline.split(' ').slice(0, 3).join(' ')} 
+                            <br className="hidden md:block"/> 
+                            {settings.heroHeadline.split(' ').slice(3).join(' ')}
+                        </span>
+                        <span className="block text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-rose-400 to-orange-500 drop-shadow-xl uppercase italic">
+                            Creative Studio
                         </span>
                     </motion.h1>
                 </div>
@@ -63,7 +87,7 @@ export const Hero = () => {
                     transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="mt-8 max-w-2xl text-center text-zinc-400 text-lg md:text-xl font-light leading-relaxed"
                 >
-                    We create everything from social media posts and banners to highly-converting thumbnails — so you can focus on building your business.
+                    {settings.heroSubheadline}
                 </motion.p>
                 
                 {/* CTA Container */}
@@ -73,15 +97,15 @@ export const Hero = () => {
                     transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     className="mt-12 flex flex-col sm:flex-row gap-5 items-center justify-center w-full"
                 >
-                    <a href="#services" className="group relative overflow-hidden flex items-center gap-3 px-10 py-5 bg-orange-500 text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all shadow-[0_0_30px_rgba(234,88,12,0.3)] hover:shadow-[0_0_50px_rgba(234,88,12,0.5)] hover:scale-105 active:scale-95">
-                        <span className="relative z-10">Start for ₹8k/mo</span>
+                    <Link href="/services" className="group relative overflow-hidden flex items-center gap-3 px-10 py-5 bg-orange-500 text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all shadow-[0_0_30px_rgba(234,88,12,0.3)] hover:shadow-[0_0_50px_rgba(234,88,12,0.5)] hover:scale-105 active:scale-95">
+                        <span className="relative z-10">Start for {settings.pricingStartingFrom}</span>
                         <svg className="w-5 h-5 relative z-10 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
-                    </a>
-                    <a href="#works" className="group flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all backdrop-blur-md hover:scale-105 active:scale-95">
+                    </Link>
+                    <Link href="/portfolio" className="group flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all backdrop-blur-md hover:scale-105 active:scale-95">
                         <span>See Portfolio</span>
-                    </a>
+                    </Link>
                 </motion.div>
             </motion.div>
         </section>

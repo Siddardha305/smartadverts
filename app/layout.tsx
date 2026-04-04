@@ -120,7 +120,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${outfit.variable} font-sans antialiased bg-black text-white`}>
+      <body className={`${outfit.variable} font-sans antialiased bg-black text-white`} suppressHydrationWarning={true}>
         {children}
       </body>
     </html>
