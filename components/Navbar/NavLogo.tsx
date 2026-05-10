@@ -15,7 +15,7 @@ export const NavLogo = () => {
     return (
         <Link href="/" onClick={handleClick} className="inline-block">
             <Image 
-                src="/logo/smartadvertslogo.png" 
+                src="/logo/smartadverts.webp" 
                 alt="SmartAdverts Logo" 
                 width={160}
                 height={32}
