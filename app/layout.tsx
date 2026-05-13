@@ -10,7 +10,6 @@ const outfit = Outfit({
 
 import Script from "next/script";
 import "@/lib/firebase"; // Initialize Firebase immediately
-import { LiquidBackground } from "@/components/LiquidBackground";
 
 
 const siteConfig = {
@@ -122,7 +121,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`${outfit.variable} font-sans antialiased bg-black text-white`} suppressHydrationWarning={true}>
-        <LiquidBackground />
         {children}
       </body>
     </html>

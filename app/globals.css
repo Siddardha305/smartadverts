@@ -3,7 +3,7 @@
 @theme {
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui;
   --color-primary: #ffffff;
-  --color-accent: #ea580c;
+  --color-accent: #f97316;
 }
 
 @layer base {
@@ -13,60 +13,49 @@
   }
 
   body {
-    @apply bg-black text-white/90 antialiased selection:bg-white/20 selection:text-white;
-    font-feature-settings: "ss01", "ss02", "cv01";
+    @apply bg-black text-white antialiased selection:bg-orange-500 selection:text-white;
+    font-feature-settings: "ss01", "ss02";
   }
 }
 
 @layer utilities {
-  .liquid-blur {
-    filter: blur(100px);
-    will-change: transform;
+  .matte-card {
+    @apply bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] hover:border-orange-500/20 transition-all duration-700;
   }
 
-  .text-elegant {
-    @apply tracking-[0.2em] font-light uppercase;
+  .glow-text {
+    text-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
   }
 
-  .glass-liquid {
-    @apply bg-white/[0.03] backdrop-blur-3xl border border-white/5 transition-all duration-1000;
+  .glass-neon {
+    @apply bg-white/[0.02] backdrop-blur-3xl border border-white/10 hover:border-orange-500/30 transition-all duration-700 rounded-[3rem];
   }
 
-  .noise-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.02;
-    z-index: 9999;
-    pointer-events: none;
-    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  .liquid-mesh {
+    background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.05) 0%, transparent 30%);
   }
 }
 
-/* Liquid Flow Animations */
-@keyframes liquid-flow {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5%, 5%) scale(1.1); }
-  66% { transform: translate(-5%, 2%) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+/* Luxury Float Animation */
+@keyframes float-slow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 }
 
-.animate-liquid {
-  animation: liquid-flow 20s ease-in-out infinite alternate;
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
 }
 
-.animate-liquid-slow {
-  animation: liquid-flow 35s ease-in-out infinite alternate-reverse;
-}
-
-/* Custom Scrollbar - Elegant */
+/* Custom Scrollbar - Cyber Black */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-black;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  @apply bg-zinc-800 rounded-full hover:bg-orange-500 transition-colors;
 }

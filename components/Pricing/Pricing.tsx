@@ -85,41 +85,48 @@ export const Pricing = () => {
           <p className="text-zinc-500 max-w-xl mx-auto text-lg font-medium italic">Choose a plan that fits your business stage. <br className="hidden md:block" /> Pause or cancel anytime.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start px-4">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className={`relative group h-full flex flex-col p-12 rounded-[3.5rem] glass-liquid hover:bg-white/[0.05] transition-all duration-1000 ${
-                plan.popular ? "md:scale-105 border-white/20" : "scale-100 opacity-60 hover:opacity-100"
+              className={`relative group h-full flex flex-col p-12 glass-neon hover:shadow-[0_0_60px_rgba(255,255,255,0.03)] transition-all duration-1000 ${
+                plan.popular ? "md:scale-105 border-orange-500/30" : "scale-100"
               }`}
             >
-                <div className="flex flex-col gap-6 mb-12">
-                    <span className="text-[10px] uppercase tracking-[0.4em] font-light text-white/40">{plan.name}</span>
+                <div className="flex flex-col gap-8 mb-12">
+                    <div className="p-4 bg-white/5 rounded-3xl w-fit group-hover:scale-110 transition-transform">{plan.icon}</div>
+                    <span className="text-[10px] uppercase tracking-[0.5em] font-black text-white/40 italic">{plan.name}</span>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-extralight tracking-tighter">{plan.price}</span>
-                        <span className="text-[10px] uppercase tracking-[0.2em] opacity-30">/mo</span>
+                        <span className={`text-6xl font-black italic tracking-tighter ${plan.popular ? "text-orange-500 glow-text" : "text-white"}`}>
+                            {plan.price}
+                        </span>
+                        <span className="text-[10px] font-black text-white/20">/MO</span>
                     </div>
                 </div>
 
                 <div className="space-y-6 mb-12 flex-1">
                     {plan.features.map((feature, i) => (
-                        <div key={i} className="flex items-center gap-4 opacity-40 group-hover:opacity-80 transition-opacity">
-                            <div className="w-1 h-1 rounded-full bg-white" />
-                            <span className="text-xs font-light tracking-wide">{feature}</span>
+                        <div key={i} className="flex items-center gap-4 group/item">
+                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${plan.popular ? "bg-orange-500" : "bg-white/20 group-hover/item:bg-white"}`} />
+                            <span className="text-xs font-medium tracking-wide text-white/50 group-hover/item:text-white transition-colors">{feature}</span>
                         </div>
                     ))}
                 </div>
 
                 <Link 
                     href="/contact" 
-                    className="group/btn flex items-center justify-between w-full py-6 border-t border-white/5 text-[10px] uppercase tracking-[0.4em] font-light transition-all hover:tracking-[0.5em]"
+                    className={`w-full py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] transition-all flex items-center justify-center gap-4 italic ${
+                        plan.popular 
+                        ? "bg-orange-500 text-white shadow-[0_0_40px_rgba(234,88,12,0.4)] hover:scale-105" 
+                        : "bg-white/5 text-white border border-white/10 hover:bg-white hover:text-black"
+                    }`}
                 >
                     <span>{plan.buttonText}</span>
-                    <div className="w-8 h-px bg-white/20 group-hover/btn:w-12 group-hover/btn:bg-white transition-all duration-700" />
+                    <Sparkles className="w-4 h-4" />
                 </Link>
             </motion.div>
           ))}
