@@ -27,11 +27,11 @@ export const About = () => {
 
             {/* Subtle Parallax Background Text */}
             <div className="absolute inset-0 flex flex-col justify-center pointer-events-none opacity-[0.03] select-none z-0">
-                <motion.h2 style={{ x: x1 }} className="text-[20vw] font-black uppercase italic whitespace-nowrap leading-none">
-                    SMARTADVERTS STUDIO
+                <motion.h2 style={{ x: x1 }} className="text-[30vw] md:text-[20vw] font-black uppercase italic whitespace-nowrap leading-none">
+                    SMARTADVERTS
                 </motion.h2>
-                <motion.h2 style={{ x: x2 }} className="text-[20vw] font-black uppercase italic whitespace-nowrap leading-none text-outline">
-                    CREATIVE EXCELLENCE
+                <motion.h2 style={{ x: x2 }} className="text-[30vw] md:text-[20vw] font-black uppercase italic whitespace-nowrap leading-none">
+                    STUDIO STUDIO
                 </motion.h2>
             </div>
         </section>
