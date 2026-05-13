@@ -8,15 +8,6 @@
 
 @layer base {
   :root {
-    --bg-main: #ffffff;
-    --bg-surface: #f8fafc;
-    --text-main: #020617;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --ring: rgba(249, 115, 22, 0.1);
-  }
-
-  [data-theme='dark'] {
     --bg-main: #020617;
     --bg-surface: #0f172a;
     --text-main: #f8fafc;

@@ -61,10 +61,10 @@ export const FeaturedThumbnails = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-4xl md:text-7xl font-black uppercase tracking-tighter text-white"
+                            className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter text-white leading-none"
                         >
                             Featured<br />
-                            <span className="text-orange-500">Works</span>
+                            <span className="text-brand">Works</span>
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 30 }}
@@ -83,7 +83,7 @@ export const FeaturedThumbnails = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.4 }}
                     >
-                        <Link href="/portfolio" className="inline-block px-8 py-4 border border-zinc-700 hover:border-orange-500 hover:bg-orange-500/10 rounded-full text-white uppercase tracking-widest text-sm font-bold transition-all">
+                        <Link href="/portfolio" className="btn-2026 btn-2026-secondary italic text-xs uppercase tracking-widest px-10">
                             View All Works
                         </Link>
                     </motion.div>
