@@ -60,49 +60,56 @@ export const Hero = () => {
 
             <motion.div
                 style={{ y: y1, opacity: opacityHero, scale }}
-                className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 mt-16 md:mt-24"
+                className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 mt-16"
             >
-                <HeroBadge />
+                {/* Elegant Badge */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 px-6 py-2 border border-white/10 rounded-full text-[10px] uppercase tracking-[0.4em] font-light text-white/60"
+                >
+                    Aesthetically Liquid Studio
+                </motion.div>
 
-                {/* Main Headline */}
-                <div className="overflow-visible">
+                {/* Main Headline - Liquid Elegance */}
+                <div className="overflow-visible flex flex-col items-center">
                     <motion.h1
-                        initial={{ opacity: 0, y: 100 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] max-w-7xl"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
+                        className="text-center text-6xl md:text-8xl lg:text-[10rem] font-extralight tracking-[-0.04em] leading-[0.8] max-w-7xl mb-8"
                     >
-                         <span className="text-white drop-shadow-sm uppercase italic block mb-2">
+                         <span className="text-white block opacity-90">
                             {settings.heroHeadline.split(' ').slice(0, 3).join(' ')} 
                         </span>
-                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-rose-500 to-orange-400 drop-shadow-2xl uppercase italic text-glow">
+                        <span className="block italic font-light opacity-50 mt-4">
                             Creative Studio
                         </span>
                     </motion.h1>
                 </div>
 
-                {/* Sub Headline */}
+                {/* Sub Headline - Elegant Spacing */}
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-10 max-w-2xl text-center text-zinc-400 text-base md:text-xl font-light leading-relaxed px-6"
+                    transition={{ duration: 1.5, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    className="max-w-xl text-center text-white/40 text-sm md:text-base font-light tracking-[0.05em] leading-relaxed px-6"
                 >
                     {settings.heroSubheadline}
                 </motion.p>
                 
-                {/* CTA Container */}
+                {/* CTA Container - Minimalist Glass */}
                 <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-12 flex flex-col sm:flex-row gap-6 items-center justify-center w-full px-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 2, delay: 1 }}
+                    className="mt-16 flex flex-col sm:flex-row gap-8 items-center justify-center w-full px-6"
                 >
-                    <Link href="/services" className="group relative overflow-hidden flex items-center gap-4 px-12 py-6 bg-orange-600 text-white rounded-full font-black uppercase tracking-widest text-[10px] sm:text-xs transition-all shadow-[0_0_40px_rgba(234,88,12,0.4)] hover:shadow-[0_0_60px_rgba(234,88,12,0.6)] hover:scale-105 active:scale-95 italic">
-                        <span className="relative z-10">Get Started — {settings.pricingStartingFrom}</span>
-                        <Zap className="w-4 h-4 fill-white relative z-10" />
+                    <Link href="/services" className="group flex items-center gap-6 text-white text-[11px] uppercase tracking-[0.5em] font-light transition-all hover:text-white hover:tracking-[0.6em] duration-700">
+                        <span>Get Started</span>
+                        <div className="w-12 h-px bg-white/20 group-hover:w-20 group-hover:bg-white transition-all duration-700" />
                     </Link>
-                    <Link href="/portfolio" className="group flex items-center justify-center gap-4 px-12 py-6 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-full font-black uppercase tracking-widest text-[10px] sm:text-xs transition-all backdrop-blur-xl hover:scale-105 active:scale-95 italic">
+                    <Link href="/portfolio" className="group flex items-center gap-6 text-white/40 text-[11px] uppercase tracking-[0.5em] font-light transition-all hover:text-white duration-700">
                         <span>Our Work</span>
                     </Link>
                 </motion.div>

@@ -85,69 +85,42 @@ export const Pricing = () => {
           <p className="text-zinc-500 max-w-xl mx-auto text-lg font-medium italic">Choose a plan that fits your business stage. <br className="hidden md:block" /> Pause or cancel anytime.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ delay: index * 0.1, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className={`relative group p-1 w-full rounded-[3.5rem] overflow-hidden transition-all duration-700 ${
-                plan.popular ? "md:scale-105 z-20" : "scale-95 opacity-80 hover:opacity-100 hover:scale-100 z-10"
+              className={`relative group h-full flex flex-col p-12 rounded-[3.5rem] glass-liquid hover:bg-white/[0.05] transition-all duration-1000 ${
+                plan.popular ? "md:scale-105 border-white/20" : "scale-100 opacity-60 hover:opacity-100"
               }`}
             >
-                {/* Animated Gradient Border for Popular Plan */}
-                {plan.popular && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 animate-spin-slow opacity-50" />
-                )}
-                {!plan.popular && (
-                    <div className="absolute inset-0 bg-white/10" />
-                )}
-
-                <div className={`relative h-full w-full bg-zinc-950 rounded-[3.4rem] p-10 md:p-12 flex flex-col gap-8`}>
-                    {plan.popular && (
-                        <div className="absolute top-8 right-10 flex items-center gap-2 px-4 py-1.5 bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-[0_10px_20px_rgba(234,88,12,0.3)]">
-                           <Rocket className="w-3 h-3" /> Most Popular
-                        </div>
-                    )}
-
-                    <div className="flex flex-col gap-4">
-                        <div className="mb-2 group-hover:scale-110 transition-transform duration-500">{plan.icon}</div>
-                        <h3 className="text-3xl font-black uppercase italic tracking-tighter leading-none">{plan.name}</h3>
-                        <p className="text-zinc-500 text-sm font-medium italic leading-relaxed">{plan.description}</p>
-                    </div>
-
+                <div className="flex flex-col gap-6 mb-12">
+                    <span className="text-[10px] uppercase tracking-[0.4em] font-light text-white/40">{plan.name}</span>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-5xl md:text-6xl font-black italic tracking-tighter">{plan.price}</span>
-                        <span className="text-zinc-600 text-sm font-bold uppercase tracking-widest">/ Month</span>
+                        <span className="text-5xl font-extralight tracking-tighter">{plan.price}</span>
+                        <span className="text-[10px] uppercase tracking-[0.2em] opacity-30">/mo</span>
                     </div>
-
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-                    <div className="space-y-5 flex-1">
-                        {plan.features.map((feature, i) => (
-                            <div key={i} className="flex items-center gap-4 group/item">
-                                <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-colors ${plan.popular ? "bg-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.3)]" : "bg-zinc-800 group-hover/item:bg-white/20"}`}>
-                                    <Check className={`w-3 h-3 ${plan.popular ? "text-white" : "text-zinc-400"}`} strokeWidth={3} />
-                                </div>
-                                <span className="text-zinc-400 text-sm font-semibold tracking-tight">{feature}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    <Link 
-                        href="/contact" 
-                        className={`w-full py-6 rounded-[2rem] font-black uppercase tracking-widest text-[10px] transition-all duration-500 flex items-center justify-center gap-4 shadow-2xl ${
-                        plan.popular 
-                        ? "bg-orange-500 text-white hover:bg-white hover:text-black hover:scale-[1.02] active:scale-95" 
-                        : "bg-white/5 text-white border border-white/10 hover:bg-white hover:text-black hover:scale-[1.02] active:scale-95"
-                        }`}
-                    >
-                        <span>{plan.buttonText}</span>
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
                 </div>
+
+                <div className="space-y-6 mb-12 flex-1">
+                    {plan.features.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-4 opacity-40 group-hover:opacity-80 transition-opacity">
+                            <div className="w-1 h-1 rounded-full bg-white" />
+                            <span className="text-xs font-light tracking-wide">{feature}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <Link 
+                    href="/contact" 
+                    className="group/btn flex items-center justify-between w-full py-6 border-t border-white/5 text-[10px] uppercase tracking-[0.4em] font-light transition-all hover:tracking-[0.5em]"
+                >
+                    <span>{plan.buttonText}</span>
+                    <div className="w-8 h-px bg-white/20 group-hover/btn:w-12 group-hover/btn:bg-white transition-all duration-700" />
+                </Link>
             </motion.div>
           ))}
         </div>
