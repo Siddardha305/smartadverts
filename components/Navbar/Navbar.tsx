@@ -35,7 +35,7 @@ export const Navbar = () => {
             <div className="container mx-auto px-6">
                 <nav className={`flex items-center justify-between px-8 py-4 rounded-full border transition-all duration-500 ${
                     scrolled 
-                        ? "bg-white/80 backdrop-blur-xl border-zinc-200 shadow-lg" 
+                        ? "bg-black/80 backdrop-blur-xl border-white/10 shadow-2xl" 
                         : "bg-transparent border-transparent"
                 }`}>
                     <NavLogo />
@@ -58,7 +58,7 @@ export const Navbar = () => {
                     {/* Mobile Menu Toggle */}
                     <button
                         className={`md:hidden p-2 rounded-xl transition-colors ${
-                            scrolled ? "text-black bg-zinc-100" : "text-white bg-white/10"
+                            scrolled ? "text-white bg-white/10" : "text-white bg-white/10"
                         }`}
                         onClick={() => setMobileOpen(!mobileOpen)}
                     >

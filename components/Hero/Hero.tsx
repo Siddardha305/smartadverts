@@ -111,21 +111,6 @@ export const Hero = () => {
                     </Link>
                 </motion.div>
 
-                {/* Social Proof Bar - 2026 Style */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 1.5 }}
-                    className="mt-32 pt-12 border-t border-[var(--border)] w-full flex flex-col md:flex-row items-center justify-between gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
-                >
-                    <span className="text-[10px] uppercase tracking-[0.4em] font-black italic">Trusted by Visionary Brands</span>
-                    <div className="flex gap-12 items-center overflow-hidden">
-                        <span className="text-2xl font-black italic tracking-tighter">NIKE</span>
-                        <span className="text-2xl font-black italic tracking-tighter">APPLE</span>
-                        <span className="text-2xl font-black italic tracking-tighter">TESLA</span>
-                        <span className="text-2xl font-black italic tracking-tighter">ADIDAS</span>
-                    </div>
-                </motion.div>
             </motion.div>
         </section>
     );
