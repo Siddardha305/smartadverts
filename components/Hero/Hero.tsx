@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { HeroBadge } from "./HeroBadge";
 import { GridBackground } from "@/components/GridBackground";
+import { Zap } from "lucide-react";
 
 
 export const Hero = () => {
