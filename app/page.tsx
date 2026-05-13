@@ -77,7 +77,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-black text-white min-h-screen selection:bg-orange-500 selection:text-white overflow-x-hidden noise-bg">
+    <main className="min-h-screen overflow-x-hidden">
       {/* JSON-LD for SEO */}
       <script
         type="application/ld+json"

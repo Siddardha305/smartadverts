@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-outfit",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-jakarta",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 import Script from "next/script";
@@ -120,7 +120,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${outfit.variable} font-sans antialiased bg-black text-white`} suppressHydrationWarning={true}>
+      <body className={`${jakarta.variable} font-sans antialiased`} suppressHydrationWarning={true}>
         {children}
       </body>
     </html>

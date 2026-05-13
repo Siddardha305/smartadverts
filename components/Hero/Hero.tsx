@@ -46,68 +46,85 @@ export const Hero = () => {
         <section
             ref={ref}
             id="home"
-            className="relative flex h-screen w-full items-center justify-center bg-black overflow-hidden liquid-mesh"
+            className="relative min-h-screen w-full flex flex-col items-center justify-center pt-32 pb-20 px-6 overflow-hidden"
         >
-            {/* Cybernetic Background Elements */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: "3s" }} />
+            {/* Background Architecture */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                <div className="absolute top-[10%] left-[5%] w-[30%] h-[30%] bg-brand/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[10%] right-[5%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
+                <GridBackground />
             </div>
 
             <motion.div
                 style={{ y: y1, opacity: opacityHero, scale }}
-                className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 mt-16"
+                className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center"
             >
-                {/* Floating Modern Badge */}
+                {/* 2026 Style Badge */}
                 <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-10 px-8 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase tracking-[0.4em] font-black italic animate-float-slow"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mb-10 px-6 py-2 bg-brand/10 border border-brand/20 rounded-full text-brand text-[10px] uppercase tracking-[0.3em] font-black italic shadow-sm"
                 >
-                    Premium Creative Engine
+                    Design Engineered for 2026
                 </motion.div>
 
-                {/* Main Headline - Ultra Wide & Glowing */}
-                <div className="overflow-visible flex flex-col items-center">
+                {/* Main Headline - The 2026 Statement */}
+                <div className="overflow-visible flex flex-col items-center text-center">
                     <motion.h1
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center text-7xl md:text-9xl lg:text-[13rem] font-black tracking-[-0.05em] leading-[0.8] text-white uppercase italic max-w-7xl mb-12 drop-shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        className="heading-huge mb-12 text-balance"
                     >
-                         <span className="block mb-4">
+                         <span className="block opacity-90">
                             {settings.heroHeadline.split(' ').slice(0, 3).join(' ')} 
                         </span>
-                        <span className="block text-orange-500 glow-text">
+                        <span className="block text-brand">
                             Studio
                         </span>
                     </motion.h1>
                 </div>
 
-                {/* Sub Headline - Minimalist Silver */}
+                {/* Sub Headline - Clean Modern Weight */}
                 <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.6 }}
-                    transition={{ duration: 1, delay: 0.6 }}
-                    className="max-w-2xl text-center text-white text-sm md:text-lg font-light tracking-widest leading-relaxed px-6 uppercase"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.3 }}
+                    className="max-w-2xl text-center text-[var(--text-muted)] text-lg md:text-2xl font-medium leading-relaxed mb-16 text-balance"
                 >
                     {settings.heroSubheadline}
                 </motion.p>
                 
-                {/* CTA Container - Glass Neon CTAs */}
+                {/* 2026 CTA Actions */}
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.8 }}
-                    className="mt-20 flex flex-col sm:flex-row gap-8 items-center justify-center w-full px-6"
+                    transition={{ duration: 1, delay: 0.5 }}
+                    className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full"
                 >
-                    <Link href="/services" className="group relative overflow-hidden flex items-center gap-6 px-14 py-7 bg-orange-600 text-white rounded-[2rem] font-black uppercase tracking-widest text-[11px] transition-all hover:scale-105 active:scale-95 italic shadow-[0_0_60px_rgba(234,88,12,0.4)]">
+                    <Link href="/services" className="btn-2026 btn-2026-primary w-full sm:w-auto px-16 group italic">
                         <span>Get Started</span>
-                        <Zap className="w-4 h-4 fill-white" />
+                        <Zap className="w-5 h-5 fill-white group-hover:scale-125 transition-transform" />
                     </Link>
-                    <Link href="/portfolio" className="group flex items-center gap-6 px-14 py-7 glass-neon text-white rounded-[2rem] font-black uppercase tracking-widest text-[11px] transition-all hover:bg-white/10 hover:scale-105 active:scale-95 italic">
-                        <span>The Work</span>
+                    <Link href="/portfolio" className="btn-2026 btn-2026-secondary w-full sm:w-auto px-16 italic">
+                        <span>The Portfolio</span>
                     </Link>
+                </motion.div>
+
+                {/* Social Proof Bar - 2026 Style */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1, duration: 1.5 }}
+                    className="mt-32 pt-12 border-t border-[var(--border)] w-full flex flex-col md:flex-row items-center justify-between gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
+                >
+                    <span className="text-[10px] uppercase tracking-[0.4em] font-black italic">Trusted by Visionary Brands</span>
+                    <div className="flex gap-12 items-center overflow-hidden">
+                        <span className="text-2xl font-black italic tracking-tighter">NIKE</span>
+                        <span className="text-2xl font-black italic tracking-tighter">APPLE</span>
+                        <span className="text-2xl font-black italic tracking-tighter">TESLA</span>
+                        <span className="text-2xl font-black italic tracking-tighter">ADIDAS</span>
+                    </div>
                 </motion.div>
             </motion.div>
         </section>

@@ -58,7 +58,7 @@ const plans = [
 
 export const Pricing = () => {
   return (
-    <section id="pricing" className="py-32 bg-black relative noise-bg overflow-hidden">
+    <section id="pricing" className="py-32 relative overflow-hidden">
       {/* Background Mesh Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-30 pointer-events-none">
           <div className="absolute top-[10%] left-[20%] w-[400px] h-[400px] bg-orange-600/20 rounded-full blur-[120px]" />
@@ -85,48 +85,54 @@ export const Pricing = () => {
           <p className="text-zinc-500 max-w-xl mx-auto text-lg font-medium italic">Choose a plan that fits your business stage. <br className="hidden md:block" /> Pause or cancel anytime.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.8 }}
               viewport={{ once: true }}
-              className={`relative group h-full flex flex-col p-12 glass-neon hover:shadow-[0_0_60px_rgba(255,255,255,0.03)] transition-all duration-1000 ${
-                plan.popular ? "md:scale-105 border-orange-500/30" : "scale-100"
+              className={`relative group h-full flex flex-col p-12 rounded-[3rem] border border-[var(--border)] transition-all duration-700 hover:-translate-y-4 ${
+                plan.popular 
+                ? "bg-[var(--bg-main)] shadow-premium z-20 border-brand/20" 
+                : "bg-[var(--bg-surface)] z-10"
               }`}
             >
-                <div className="flex flex-col gap-8 mb-12">
-                    <div className="p-4 bg-white/5 rounded-3xl w-fit group-hover:scale-110 transition-transform">{plan.icon}</div>
-                    <span className="text-[10px] uppercase tracking-[0.5em] font-black text-white/40 italic">{plan.name}</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className={`text-6xl font-black italic tracking-tighter ${plan.popular ? "text-orange-500 glow-text" : "text-white"}`}>
-                            {plan.price}
-                        </span>
-                        <span className="text-[10px] font-black text-white/20">/MO</span>
+                {plan.popular && (
+                    <div className="absolute top-0 right-12 -translate-y-1/2 px-6 py-2 bg-brand text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-lg">
+                        Highly Recommended
                     </div>
+                )}
+
+                <div className="mb-12">
+                    <span className="text-[10px] uppercase tracking-[0.4em] font-black italic text-brand mb-4 block">{plan.name}</span>
+                    <div className="flex items-baseline gap-2 mb-6">
+                        <span className="text-6xl font-black italic tracking-tighter text-[var(--text-main)]">{plan.price}</span>
+                        <span className="text-xs font-bold text-[var(--text-muted)] opacity-50 uppercase">/ Month</span>
+                    </div>
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed font-medium italic">{plan.description}</p>
                 </div>
 
                 <div className="space-y-6 mb-12 flex-1">
                     {plan.features.map((feature, i) => (
                         <div key={i} className="flex items-center gap-4 group/item">
-                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${plan.popular ? "bg-orange-500" : "bg-white/20 group-hover/item:bg-white"}`} />
-                            <span className="text-xs font-medium tracking-wide text-white/50 group-hover/item:text-white transition-colors">{feature}</span>
+                            <div className={`w-2 h-2 rounded-full ${plan.popular ? "bg-brand animate-pulse" : "bg-[var(--text-muted)] opacity-30"}`} />
+                            <span className="text-xs font-bold text-[var(--text-main)] tracking-tight opacity-70 group-hover/item:opacity-100 transition-opacity">{feature}</span>
                         </div>
                     ))}
                 </div>
 
                 <Link 
                     href="/contact" 
-                    className={`w-full py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] transition-all flex items-center justify-center gap-4 italic ${
+                    className={`btn-2026 ${
                         plan.popular 
-                        ? "bg-orange-500 text-white shadow-[0_0_40px_rgba(234,88,12,0.4)] hover:scale-105" 
-                        : "bg-white/5 text-white border border-white/10 hover:bg-white hover:text-black"
-                    }`}
+                        ? "btn-2026-primary" 
+                        : "btn-2026-secondary"
+                    } italic text-[11px] uppercase tracking-[0.3em]`}
                 >
                     <span>{plan.buttonText}</span>
-                    <Sparkles className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                 </Link>
             </motion.div>
           ))}

@@ -1,61 +1,94 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui;
-  --color-primary: #ffffff;
-  --color-accent: #f97316;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui;
+  --color-brand: #f97316;
+  --color-brand-hover: #ea580c;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --bg-main: #ffffff;
+    --bg-surface: #f8fafc;
+    --text-main: #020617;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --ring: rgba(249, 115, 22, 0.1);
+  }
+
+  [data-theme='dark'] {
+    --bg-main: #020617;
+    --bg-surface: #0f172a;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    --ring: rgba(249, 115, 22, 0.2);
   }
 
   body {
-    @apply bg-black text-white antialiased selection:bg-orange-500 selection:text-white;
-    font-feature-settings: "ss01", "ss02";
+    @apply bg-[var(--bg-main)] text-[var(--text-main)] antialiased transition-colors duration-500;
+    font-feature-settings: "cv02", "cv03", "cv04";
   }
 }
 
 @layer utilities {
-  .matte-card {
-    @apply bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] hover:border-orange-500/20 transition-all duration-700;
+  /* Bento Grid Base */
+  .bento-card {
+    @apply bg-[var(--bg-surface)] border border-[var(--border)] rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)];
   }
 
-  .glow-text {
-    text-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
+  /* Layered Surfaces */
+  .surface-elevated {
+    @apply bg-[var(--bg-main)] border border-[var(--border)] shadow-sm rounded-3xl p-6;
   }
 
-  .glass-neon {
-    @apply bg-white/[0.02] backdrop-blur-3xl border border-white/10 hover:border-orange-500/30 transition-all duration-700 rounded-[3rem];
+  /* Premium Buttons */
+  .btn-2026 {
+    @apply relative overflow-hidden px-8 py-4 rounded-2xl font-bold tracking-tight transition-all duration-500 flex items-center justify-center gap-3 active:scale-95;
+  }
+  
+  .btn-2026-primary {
+    @apply bg-brand text-white hover:bg-brand-hover shadow-[0_10px_25px_rgba(249,115,22,0.2)];
   }
 
-  .liquid-mesh {
-    background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 30%),
-                radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.05) 0%, transparent 30%);
+  .btn-2026-secondary {
+    @apply bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--border)] hover:bg-[var(--bg-main)];
+  }
+
+  /* Typography */
+  .heading-huge {
+    @apply text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.85] uppercase italic;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
-/* Luxury Float Animation */
-@keyframes float-slow {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+/* 2026 Interaction Shadows */
+.shadow-premium {
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.1), 0 30px 60px -30px rgba(0, 0, 0, 0.15);
 }
 
-.animate-float-slow {
-  animation: float-slow 8s ease-in-out infinite;
+/* Smooth Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Custom Scrollbar - Cyber Black */
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-black;
+  @apply bg-[var(--bg-main)];
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-800 rounded-full hover:bg-orange-500 transition-colors;
+  @apply bg-[var(--border)] rounded-full hover:bg-brand transition-colors;
 }

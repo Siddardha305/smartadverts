@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { NavLogo } from "./NavLogo";
@@ -26,33 +27,44 @@ export const Navbar = () => {
     }, []);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-[100] px-4 py-8 pointer-events-none">
-            <div className="max-w-7xl mx-auto flex items-center justify-center pointer-events-auto">
-                <div className={`flex items-center gap-8 md:gap-12 px-6 md:px-8 py-3 rounded-full transition-all duration-500 border ${
+        <header
+            className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+                scrolled ? "py-4" : "py-8"
+            }`}
+        >
+            <div className="container mx-auto px-6">
+                <nav className={`flex items-center justify-between px-8 py-4 rounded-full border transition-all duration-500 ${
                     scrolled 
-                        ? "bg-black/90 border-white/10 backdrop-blur-xl shadow-2xl" 
-                        : "bg-black/40 border-transparent backdrop-blur-md"
+                        ? "bg-white/80 backdrop-blur-xl border-zinc-200 shadow-lg" 
+                        : "bg-transparent border-transparent"
                 }`}>
                     <NavLogo />
-                    <NavLinks />
-                    
-                    {/* Integrated CTA Button */}
-                    <div className="hidden md:block border-l border-white/10 pl-8">
-                        <NavCTA />
-                    </div>
-                </div>
 
-                {/* Mobile Menu Toggle (Only visible on small screens) */}
-                <div className="absolute right-8 md:hidden pointer-events-auto">
-                    <button 
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex items-center gap-10">
+                        <NavLinks />
+                    </div>
+
+                    {/* CTA Action - 2026 Style */}
+                    <div className="hidden md:block">
+                        <Link 
+                            href="/contact" 
+                            className="px-8 py-3 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest italic hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 shadow-lg"
+                        >
+                            Get Started
+                        </Link>
+                    </div>
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        className={`md:hidden p-2 rounded-xl transition-colors ${
+                            scrolled ? "text-black bg-zinc-100" : "text-white bg-white/10"
+                        }`}
                         onClick={() => setMobileOpen(!mobileOpen)}
-                        className="w-12 h-12 bg-white rounded-full flex flex-col items-center justify-center gap-1 shadow-lg"
                     >
-                        <div className={`w-6 h-0.5 bg-black transition-all ${mobileOpen ? "rotate-45 translate-y-1.5" : ""}`} />
-                        <div className={`w-6 h-0.5 bg-black transition-all ${mobileOpen ? "opacity-0" : ""}`} />
-                        <div className={`w-6 h-0.5 bg-black transition-all ${mobileOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />
+                        {mobileOpen ? <X /> : <Menu />}
                     </button>
-                </div>
+                </nav>
             </div>
 
             {/* Mobile Portal */}
@@ -76,6 +88,6 @@ export const Navbar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </nav>
+        </header>
     );
 };
