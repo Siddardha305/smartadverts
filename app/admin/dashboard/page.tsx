@@ -2,22 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db, storage } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { 
-    collection, 
-    query, 
-    orderBy, 
-    onSnapshot, 
-    addDoc, 
-    deleteDoc, 
-    doc, 
-    setDoc, 
-    getDoc,
-    Timestamp 
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 import { Mailbox, PaintBucket, Settings } from "lucide-react";
+
 import { Toast, ToastType } from "@/components/ui/Toast";
 import { ConfirmModal, ConfirmDialogData } from "@/components/ui/ConfirmModal";
 
@@ -80,23 +69,61 @@ export default function AdminDashboard() {
     // Data Fetching
     useEffect(() => {
         if (!user) return;
-        const qLeads = query(collection(db, "leads"), orderBy("timestamp", "desc"));
-        const unsubLeads = onSnapshot(qLeads, (snapshot) => {
-            setLeads(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead)));
-        });
-        const qPortfolio = query(collection(db, "portfolio"), orderBy("timestamp", "desc"));
-        const unsubPortfolio = onSnapshot(qPortfolio, (snapshot) => {
-            setPortfolio(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioItem)));
-        });
-        const fetchSettings = async () => {
-            const settingsDoc = await getDoc(doc(db, "config", "siteSettings"));
-            if (settingsDoc.exists()) setSettings(settingsDoc.data() as SiteSettings);
+        
+        // Fetch Leads from MongoDB
+        const fetchLeads = async () => {
+            try {
+                const response = await fetch("/api/contact");
+                if (response.ok) {
+                    const data = await response.json();
+                    setLeads(data.map((item: any) => ({ ...item, id: item._id })));
+                }
+            } catch (error) {
+                console.error("Error fetching leads:", error);
+            }
         };
+
+        // Fetch Portfolio from MongoDB
+        const fetchPortfolio = async () => {
+            try {
+                const response = await fetch("/api/portfolio");
+                if (response.ok) {
+                    const data = await response.json();
+                    setPortfolio(data.map((item: any) => ({ ...item, id: item._id })));
+                }
+            } catch (error) {
+                console.error("Error fetching portfolio:", error);
+            }
+        };
+
+        // Fetch Settings from MongoDB
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch("/api/settings");
+                if (response.ok) {
+                    const data = await response.json();
+                    setSettings(data);
+                }
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        };
+
+        fetchLeads();
+        fetchPortfolio();
         fetchSettings();
-        return () => { unsubLeads(); unsubPortfolio(); };
     }, [user]);
 
-    // Image Compression Logic
+    // Image to Base64 Logic
+    const fileToBase64 = (file: File | Blob): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
     const compressImage = async (file: File): Promise<Blob | File> => {
         return new Promise((resolve) => {
             const url = URL.createObjectURL(file);
@@ -139,22 +166,17 @@ export default function AdminDashboard() {
             const afterBlob = afterFile ? await compressImage(afterFile) : null;
             setUploadProgress(30);
 
+            // 2. CONVERT TO BASE64 (SAVE DIRECTLY IN MONGODB)
             let bu = ""; 
             let au = "";
-            const dateFolder = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
-            // 2. BULLETPROOF SEQUENTIAL UPLOADS
             if (beforeBlob) {
-                const br = ref(storage, `portfolio/${dateFolder}/${Date.now()}_before.jpg`); 
-                const bt = await uploadBytes(br, beforeBlob);
-                bu = await getDownloadURL(bt.ref);
+                bu = await fileToBase64(beforeBlob);
                 setUploadProgress(60);
             }
 
             if (afterBlob) {
-                const ar = ref(storage, `portfolio/${dateFolder}/${Date.now()}_after.jpg`); 
-                const at = await uploadBytes(ar, afterBlob);
-                au = await getDownloadURL(at.ref);
+                au = await fileToBase64(afterBlob);
                 setUploadProgress(90);
             }
 
@@ -162,16 +184,38 @@ export default function AdminDashboard() {
                 const updateData: any = { title: newProject.title, description: newProject.description };
                 if (bu) updateData.before = bu; 
                 if (au) updateData.after = au;
-                await setDoc(doc(db, "portfolio", editingId), updateData, { merge: true });
+                
+                const res = await fetch(`/api/portfolio/${editingId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updateData),
+                });
+                
+                if (!res.ok) throw new Error("Failed to update project");
                 setEditingId(null);
             } else {
-                await addDoc(collection(db, "portfolio"), { 
-                    title: newProject.title, 
-                    description: newProject.description, 
-                    before: bu, 
-                    after: au, 
-                    timestamp: Timestamp.now() 
+                const res = await fetch("/api/portfolio", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        title: newProject.title, 
+                        description: newProject.description, 
+                        before: bu, 
+                        after: au 
+                    }),
                 });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || "Failed to save project");
+                }
+            }
+
+            // RE-FETCH DATA IMMEDIATELY
+            const refreshRes = await fetch("/api/portfolio");
+            if (refreshRes.ok) {
+                const data = await refreshRes.json();
+                setPortfolio(data.map((item: any) => ({ ...item, id: item._id })));
             }
 
             setUploadProgress(100);
@@ -204,9 +248,13 @@ export default function AdminDashboard() {
             title: "Delete Case Study",
             message: "Are you sure you want to delete this project? This action cannot be undone.",
             onConfirm: async () => {
-                await deleteDoc(doc(db, "portfolio", id));
+                await fetch(`/api/portfolio/${id}`, {
+                    method: "DELETE",
+                });
                 showToast("Project Deleted", "success");
                 setConfirmDialog(null);
+                // Trigger re-fetch or manual update
+                setPortfolio(prev => prev.filter(p => p.id !== id));
             }
         });
     };
@@ -215,10 +263,18 @@ export default function AdminDashboard() {
         e.preventDefault(); 
         setIsSavingSettings(true); 
         try { 
-            await setDoc(doc(db, "config", "siteSettings"), settings); 
-            showToast("Website Config Updated!"); 
-        } catch (err) { 
-            showToast("Error updating settings!", "error"); 
+            const response = await fetch("/api/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(settings),
+            });
+            if (response.ok) {
+                showToast("Website Config Updated!"); 
+            } else {
+                throw new Error("Failed to save settings");
+            }
+        } catch (err: any) { 
+            showToast(err.message || "Error updating settings!", "error"); 
         } finally { 
             setIsSavingSettings(false); 
         } 

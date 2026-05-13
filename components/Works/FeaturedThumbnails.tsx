@@ -4,8 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { BeforeAfterSlider } from "@/components/Works/BeforeAfterSlider";
 import { BeforeAfterCard } from "@/components/Works/BeforeAfterCard";
-import { db } from "@/lib/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+
 import Link from "next/link";
 
 interface PortfolioItem {
@@ -33,21 +32,23 @@ export const FeaturedThumbnails = () => {
     const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
     useEffect(() => {
-        const q = query(
-            collection(db, "portfolio"), 
-            orderBy("timestamp", "desc"), 
-            limit(4)
-        );
-        
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetched = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as PortfolioItem));
-            setDisplayWorks(fetched);
-        });
+        const fetchWorks = async () => {
+            try {
+                const response = await fetch("/api/portfolio");
+                if (response.ok) {
+                    const data = await response.json();
+                    // Limit to 4 for featured section
+                    setDisplayWorks(data.slice(0, 4).map((item: any) => ({
+                        ...item,
+                        id: item._id
+                    })));
+                }
+            } catch (error) {
+                console.error("Error fetching works:", error);
+            }
+        };
 
-        return () => unsubscribe();
+        fetchWorks();
     }, []);
 
     return (

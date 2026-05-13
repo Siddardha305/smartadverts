@@ -2,8 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 
 export const Contact = () => {
     const ref = useRef(null);
@@ -29,35 +28,31 @@ export const Contact = () => {
         setStatus("submitting");
         setErrorMessage("");
 
-        // Timeout logic to prevent the button from hanging forever
-        const timeout = setTimeout(() => {
-            if (status === "submitting") {
-                setStatus("error");
-                setErrorMessage("Connection Timeout. Please check your network or Firebase rules.");
-            }
-        }, 10000); // 10 seconds timeout
-
         try {
-            console.log("Attempting to save lead to Firebase...", formData);
+            console.log("Attempting to save lead to MongoDB...", formData);
             
-            // Save to Firebase Firestore "leads" collection
-            const docRef = await addDoc(collection(db, "leads"), {
-                ...formData,
-                timestamp: serverTimestamp(),
-                source: "Portfolio Contact Form",
-                createdAt: new Date().toISOString()
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
             });
 
-            console.log("Document successfully written with ID: ", docRef.id);
-            clearTimeout(timeout);
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Failed to save lead");
+            }
+
+            console.log("Lead successfully saved to MongoDB:", result.id);
             setStatus("success");
             setFormData({ name: "", email: "", message: "" });
             
         } catch (error: any) {
-            clearTimeout(timeout);
-            console.error("FIREBASE ERROR:", error);
+            console.error("DATABASE ERROR:", error);
             setStatus("error");
-            setErrorMessage(error.message || "Failed to connect to Database. Did you enable 'Rules' in Firebase?");
+            setErrorMessage(error.message || "Failed to connect to Database.");
         }
     };
 
@@ -121,7 +116,7 @@ export const Contact = () => {
 
                     {status === "success" && (
                         <p className="text-black text-center font-bold text-xs uppercase tracking-widest mt-8">
-                            Success! Your message is securely saved in your Firebase Database. 🚀
+                            Success! Your message is securely saved in your Database. 🚀
                         </p>
                     )}
 
@@ -129,7 +124,7 @@ export const Contact = () => {
                         <div className="mt-8 p-4 bg-black/10 border border-black/20 rounded-2xl text-center">
                             <p className="text-black font-bold text-xs uppercase tracking-widest mb-2">Error Details:</p>
                             <p className="text-black/70 text-xs font-mono">{errorMessage}</p>
-                            <p className="text-black text-[10px] font-bold uppercase mt-4 opacity-50">Please ensure Firebase Rules are set to 'test mode' or 'write: if true'</p>
+                            <p className="text-black text-[10px] font-bold uppercase mt-4 opacity-50">Please ensure MongoDB Atlas is reachable and Whitelisted your IP.</p>
                         </div>
                     )}
                 </form>

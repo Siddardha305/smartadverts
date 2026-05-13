@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+
 import { BeforeAfterCard } from "./BeforeAfterCard";
 
 interface PortfolioItem {
@@ -22,18 +21,24 @@ export const WorksMasonry = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const q = query(collection(db, "portfolio"), orderBy("timestamp", "desc"));
-        
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetched = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as PortfolioItem));
-            setWorks(fetched);
-            setLoading(false);
-        });
+        const fetchWorks = async () => {
+            try {
+                const response = await fetch("/api/portfolio");
+                if (response.ok) {
+                    const data = await response.json();
+                    setWorks(data.map((item: any) => ({
+                        ...item,
+                        id: item._id
+                    })));
+                }
+            } catch (error) {
+                console.error("Error fetching works:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        return () => unsubscribe();
+        fetchWorks();
     }, []);
 
     if (loading) {

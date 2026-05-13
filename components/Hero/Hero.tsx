@@ -5,8 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { HeroBadge } from "./HeroBadge";
 import { GridBackground } from "@/components/GridBackground";
-import { db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+
 
 export const Hero = () => {
     const ref = useRef(null);
@@ -17,12 +16,19 @@ export const Hero = () => {
     });
 
     useEffect(() => {
-        const unsub = onSnapshot(doc(db, "config", "siteSettings"), (doc) => {
-            if (doc.exists()) {
-                setSettings(doc.data() as any);
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch("/api/settings");
+                if (response.ok) {
+                    const data = await response.json();
+                    setSettings(data);
+                }
+            } catch (error) {
+                console.error("Error fetching hero settings:", error);
             }
-        });
-        return () => unsub();
+        };
+
+        fetchSettings();
     }, []);
 
     const { scrollYProgress } = useScroll({
