@@ -45,17 +45,14 @@ export const Hero = () => {
         <section
             ref={ref}
             id="home"
-            className="relative flex h-screen w-full items-center justify-center bg-black overflow-hidden"
+            className="relative flex h-screen w-full items-center justify-center bg-black overflow-hidden noise-bg"
         >
-            {/* Abstract Background Orbs with deeper parallax */}
-            <motion.div
-                style={{ y: y2 }}
-                className="absolute top-[-20%] left-[-15%] h-[600px] w-[600px] rounded-full bg-orange-600/10 blur-[150px] pointer-events-none"
-            />
-            <motion.div
-                style={{ y: y1 }}
-                className="absolute bottom-[-20%] right-[-15%] h-[700px] w-[700px] rounded-full bg-rose-600/10 blur-[150px] pointer-events-none"
-            />
+            {/* Next Level Mesh Gradients */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-orange-600/20 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-rose-600/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "2s" }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[150px]" />
+            </div>
 
             {/* Premium Dotted Background Grid */}
             <GridBackground />
@@ -64,23 +61,20 @@ export const Hero = () => {
                 style={{ y: y1, opacity: opacityHero, scale }}
                 className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 mt-16 md:mt-24"
             >
-                {/* Reveal Animations */}
                 <HeroBadge />
 
                 {/* Main Headline */}
-                <div className="overflow-hidden">
+                <div className="overflow-visible">
                     <motion.h1
                         initial={{ opacity: 0, y: 100 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.05] max-w-5xl"
+                        className="text-center text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] max-w-7xl"
                     >
-                         <span className="text-white drop-shadow-sm uppercase italic">
+                         <span className="text-white drop-shadow-sm uppercase italic block mb-2">
                             {settings.heroHeadline.split(' ').slice(0, 3).join(' ')} 
-                            <br className="hidden md:block"/> 
-                            {settings.heroHeadline.split(' ').slice(3).join(' ')}
                         </span>
-                        <span className="block text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-rose-400 to-orange-500 drop-shadow-xl uppercase italic">
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-rose-500 to-orange-400 drop-shadow-2xl uppercase italic text-glow">
                             Creative Studio
                         </span>
                     </motion.h1>
@@ -91,7 +85,7 @@ export const Hero = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-8 max-w-2xl text-center text-zinc-400 text-lg md:text-xl font-light leading-relaxed"
+                    className="mt-10 max-w-2xl text-center text-zinc-400 text-base md:text-xl font-light leading-relaxed px-6"
                 >
                     {settings.heroSubheadline}
                 </motion.p>
@@ -101,16 +95,14 @@ export const Hero = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-12 flex flex-col sm:flex-row gap-5 items-center justify-center w-full"
+                    className="mt-12 flex flex-col sm:flex-row gap-6 items-center justify-center w-full px-6"
                 >
-                    <Link href="/services" className="group relative overflow-hidden flex items-center gap-3 px-10 py-5 bg-orange-500 text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all shadow-[0_0_30px_rgba(234,88,12,0.3)] hover:shadow-[0_0_50px_rgba(234,88,12,0.5)] hover:scale-105 active:scale-95">
-                        <span className="relative z-10">Start for {settings.pricingStartingFrom}</span>
-                        <svg className="w-5 h-5 relative z-10 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                    <Link href="/services" className="group relative overflow-hidden flex items-center gap-4 px-12 py-6 bg-orange-600 text-white rounded-full font-black uppercase tracking-widest text-[10px] sm:text-xs transition-all shadow-[0_0_40px_rgba(234,88,12,0.4)] hover:shadow-[0_0_60px_rgba(234,88,12,0.6)] hover:scale-105 active:scale-95 italic">
+                        <span className="relative z-10">Get Started — {settings.pricingStartingFrom}</span>
+                        <Zap className="w-4 h-4 fill-white relative z-10" />
                     </Link>
-                    <Link href="/portfolio" className="group flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm transition-all backdrop-blur-md hover:scale-105 active:scale-95">
-                        <span>See Portfolio</span>
+                    <Link href="/portfolio" className="group flex items-center justify-center gap-4 px-12 py-6 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-full font-black uppercase tracking-widest text-[10px] sm:text-xs transition-all backdrop-blur-xl hover:scale-105 active:scale-95 italic">
+                        <span>Our Work</span>
                     </Link>
                 </motion.div>
             </motion.div>

@@ -3,11 +3,13 @@
 import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Hero } from "@/components/Hero/Hero";
-import { HowItWorks } from "@/components/HowItWorks/HowItWorks";
+import { Process } from "@/components/Process/Process";
 import { FeaturedThumbnails } from "@/components/Works/FeaturedThumbnails";
 import { InstagramShowcase } from "@/components/InstagramShowcase/InstagramShowcase";
 import { Services } from "@/components/Services/Services";
 import { Testimonials } from "@/components/Testimonials/Testimonials";
+import { Pricing } from "@/components/Pricing/Pricing";
+import { FAQ } from "@/components/FAQ/FAQ";
 import { About } from "@/components/About/About";
 import { Contact } from "@/components/Contact/Contact";
 import { Footer } from "@/components/Footer/Footer";
@@ -29,7 +31,6 @@ export default function Home() {
 
     requestAnimationFrame(raf);
 
-    // Cleanup on unmount
     return () => {
       lenis.destroy();
     };
@@ -76,7 +77,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-black text-white min-h-screen selection:bg-orange-500 selection:text-white overflow-x-hidden">
+    <main className="bg-black text-white min-h-screen selection:bg-orange-500 selection:text-white overflow-x-hidden noise-bg">
       {/* JSON-LD for SEO */}
       <script
         type="application/ld+json"
@@ -85,37 +86,38 @@ export default function Home() {
       
       <Navbar />
       
-      {/* Hero doesn't need ScrollReveal, it has its own complex entry */}
       <Hero />
       
-      {/* Dynamic Reveal: Slide Up */}
       <ScrollReveal direction="up" distance={80} delay={0.1}>
-          <HowItWorks />
+          <Process />
       </ScrollReveal>
 
-      {/* Dynamic Reveal: Slide Left */}
       <ScrollReveal direction="left" distance={100}>
           <FeaturedThumbnails />
       </ScrollReveal>
 
-      {/* Dynamic Reveal: Slide Right */}
       <ScrollReveal direction="right" distance={100}>
           <InstagramShowcase />
       </ScrollReveal>
 
-      {/* Dynamic Reveal: Scaling Focus */}
       <ScrollReveal direction="none" scale={0.9} duration={1.2}>
           <Services />
       </ScrollReveal>
 
-      {/* Dynamic Reveal: Standard Up */}
       <ScrollReveal direction="up" distance={60}>
           <Testimonials />
       </ScrollReveal>
 
-      {/* Dynamic Reveal: Slide Left */}
+      <ScrollReveal direction="none" scale={0.95} duration={1}>
+          <Pricing />
+      </ScrollReveal>
+
       <ScrollReveal direction="left" distance={100}>
           <About />
+      </ScrollReveal>
+
+      <ScrollReveal direction="up" distance={60}>
+          <FAQ />
       </ScrollReveal>
 
       <Contact />
