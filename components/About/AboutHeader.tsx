@@ -1,76 +1,110 @@
+"use client";
+
 import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Users, Zap, Award, Globe } from "lucide-react";
+
+const stats = [
+    { label: "Happy Clients", value: "200+", icon: <Users className="w-5 h-5" /> },
+    { label: "Designs Made", value: "1.5k+", icon: <Zap className="w-5 h-5" /> },
+    { label: "Awards Won", value: "12", icon: <Award className="w-5 h-5" /> },
+    { label: "Global Reach", value: "15+", icon: <Globe className="w-5 h-5" /> },
+];
 
 export const AboutHeader = () => {
     return (
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-16 lg:gap-12 w-full text-left">
-            <div className="w-full lg:w-1/3 flex flex-col items-start lg:sticky lg:top-32">
-                <motion.p
-                    initial={{ opacity: 0, x: -30 }}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            {/* Visual Side */}
+            <div className="relative order-2 lg:order-1">
+                <div className="grid grid-cols-2 gap-4">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8 }}
+                        className="aspect-[3/4] rounded-3xl bg-zinc-900 border border-white/5 overflow-hidden"
+                    >
+                        <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80" alt="Creative" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                    </motion.div>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="aspect-square rounded-3xl bg-zinc-900 border border-white/5 overflow-hidden mt-12"
+                    >
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80" alt="Design" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                    </motion.div>
+                </div>
+                
+                {/* Floating Stats Card */}
+                <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8 }}
-                    className="flex items-center gap-4 text-orange-500 font-bold uppercase tracking-widest text-sm mb-6"
+                    transition={{ delay: 0.5 }}
+                    className="absolute -bottom-8 -right-8 glass p-8 rounded-[2rem] border border-orange-500/20 shadow-2xl hidden md:block"
                 >
-                    <span className="w-12 h-[2px] bg-orange-500"></span>{" "}
-                    About The Studio
-                </motion.p>
-                <motion.h3
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 1, delay: 0.2 }}
-                    className="text-2xl font-light text-zinc-400 max-w-sm mb-6"
-                >
-                    Bridging the gap between pure visual aesthetics and high-converting performance logic.
-                </motion.h3>
+                    <div className="text-4xl font-black italic text-orange-500">24H</div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Average Turnaround</div>
+                </motion.div>
             </div>
 
-            <div className="w-full lg:w-2/3">
-                <motion.h2
-                    initial={{ opacity: 0, y: 30 }}
+            {/* Content Side */}
+            <div className="order-1 lg:order-2">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 1, delay: 0.4 }}
-                    className="text-3xl md:text-5xl lg:text-5xl font-medium tracking-tight leading-snug md:leading-tight text-zinc-300"
+                    className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-black uppercase tracking-widest mb-8"
                 >
-                    We Exist Because Good Design <span className="text-white font-black italic">Shouldn't Be Expensive</span>
+                    <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                    Our Story
+                </motion.div>
+
+                <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-4xl md:text-6xl font-black uppercase italic leading-[0.9] mb-8"
+                >
+                    We Build <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">Brands</span> <br />
+                    That Demand <span className="text-glow">Attention.</span>
                 </motion.h2>
 
-                <div className="mt-12 space-y-8 text-lg md:text-xl font-light text-zinc-400 leading-relaxed max-w-4xl">
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                    >
-                        Most small businesses can't afford a full-time graphic designer — but they still need to look professional online. That's why we started this service. We connect local businesses with skilled designers who work behind the scenes to keep your brand looking sharp, consistent, and eye-catching every single day.
-                    </motion.p>
+                <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-zinc-400 text-lg leading-relaxed mb-12 max-w-xl"
+                >
+                    SmartAdverts was born from a simple observation: Most small businesses can&apos;t afford a full-time creative team, yet the digital world demands high-end visuals daily. We bridged that gap with a subscription that gives you unlimited access to elite design talent.
+                </motion.p>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 1, delay: 0.6 }}
-                    >
-                        No contracts, no complicated processes — just <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 font-bold">great design, on time, every time.</span>
-                    </motion.p>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-8 mb-12">
+                    {stats.map((stat, i) => (
+                        <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 + (i * 0.1) }}
+                            className="flex flex-col gap-2"
+                        >
+                            <div className="flex items-center gap-3 text-orange-500">
+                                {stat.icon}
+                                <span className="text-2xl font-black italic">{stat.value}</span>
+                            </div>
+                            <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{stat.label}</span>
+                        </motion.div>
+                    ))}
                 </div>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.8 }}
-                    className="mt-16"
+                    transition={{ delay: 0.5 }}
                 >
-                    <Link href="/about" className="inline-flex items-center gap-4 px-8 py-4 bg-white/10 hover:bg-orange-500 text-white border border-white/20 hover:border-orange-500 rounded-full font-bold uppercase tracking-wide transition-all duration-300 shadow-xl group">
-                        Get to Know Us
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform group-hover:translate-x-1 transition-transform">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
+                    <Link href="/contact" className="group flex items-center gap-4 text-white font-black uppercase tracking-widest text-xs italic">
+                        <span className="pb-1 border-b-2 border-orange-500 group-hover:border-white transition-all">Start Your Journey</span>
+                        <Zap className="w-4 h-4 text-orange-500 group-hover:translate-x-2 transition-transform" />
                     </Link>
                 </motion.div>
             </div>
